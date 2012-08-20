@@ -16,7 +16,7 @@ maximum, minimum and average running times.
 ## Example output
 
 ```sh
-  robert@robert-uol:~/git/benchmark-script$ ./benchmark.py 5 sudo apt-get update
+  $ benchmark.py 5 sudo apt-get update
                  system              user                total               
   min            0:00:00.000012      0:00:01.000029      0:00:01.000044      
   max            0:00:00.000016      0:00:01.000034      0:00:01.000046      
