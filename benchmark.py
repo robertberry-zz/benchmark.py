@@ -101,7 +101,7 @@ def main():
         for t in TIMES:
             history[t].append(times[t])
         
-    columns = "".join("{" + "{}:<20".format(i) + "}" for i in \
+    columns = "".join("{" + "{0}:<20".format(i) + "}" for i in \
                           range(len(history) + 1))
     
     print(columns.format("", *TIMES))
