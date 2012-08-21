@@ -66,8 +66,8 @@ def parse_time_output(output):
         reg_ex = re.compile(MATCH_TIME_RE + name)
         match = reg_ex.search(output)
         if not match:
-            raise ParseTimeError(("Could not find {} time in output: " + \
-                                     "{}").format(name, output))
+            raise ParseTimeError(("Could not find {0} time in output: " + \
+                                     "{1}").format(name, output))
         return parse_time(match.group(1))
 
     return dict((k, extract_time(k)) for k in TIMES)
