@@ -5,16 +5,19 @@ Relies on /usr/bin/time being available (and with the same output format as it
 has on my current Debian box ;P).
 """
 
+from __future__ import print_function
+
 import subprocess
 import argparse
 import re
 
+from collections import defaultdict
 from datetime import timedelta
 
 TIME = "/usr/bin/time"
-
 MATCH_TIME_RE = "((?:\d+:)?\d{1,2}\.\d\d)"
 EXTRACT_TIME_RE = re.compile("(?:(\d+):)?(\d{1,2})\.(\d\d)")
+TIMES = ("system", "user", "elapsed")
 
 class BenchmarkError(Exception):
     """Module-level exception.
@@ -66,11 +69,8 @@ def parse_time_output(output):
             raise ParseTimeError(("Could not find {} time in output: " + \
                                      "{}").format(name, output))
         return parse_time(match.group(1))
-    
-    sys_time = extract_time("system")
-    user_time = extract_time("user")
 
-    return dict(system=sys_time, user=user_time, total=sys_time + user_time)
+    return dict((k, extract_time(k)) for k in TIMES)
     
 def time_process(command):
     """Given the name of a command, times it, returning a dict of timedeltas
@@ -94,22 +94,21 @@ def main():
 
     args = parser.parse_args()
 
-    sys_times = []
-    user_times = []
-    total_times = []
+    history = defaultdict(list)
 
     for i in range(args.n_times):
         times = time_process(args.command)
-        sys_times.append(times["system"])
-        user_times.append(times["user"])
-        total_times.append(times["total"])
+        for t in TIMES:
+            history[t].append(times[t])
         
-    columns = "{:<15}{:<20}{:<20}{:<20}"
+    columns = "".join("{" + "{}:<20".format(i) + "}" for i in \
+                          range(len(history) + 1))
     
-    print columns.format("", "system", "user", "total")
+    print(columns.format("", *TIMES))
 
     def print_row(name, f):
-        print columns.format(name, f(sys_times), f(user_times), f(total_times))
+        f_history = [f(history[k]) for k in TIMES]
+        print(columns.format(name, *f_history))
     
     print_row("min", min)
     print_row("max", max)
